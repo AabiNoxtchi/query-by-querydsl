@@ -43,8 +43,6 @@ public class StudentFilter {
                 buildComparisonPredicate(student.age::lt, ageLessThan),
                 buildComparisonPredicate(student.enrollments.size()::gt, enrollmentsCountGreaterThan),
                 buildComparisonPredicate(student.enrollments.size()::lt, enrollmentsCountLessThan),
-                buildCourseNamePredicate(courseName, courseGrade, student),
-                buildCourseGradePredicate(courseName, courseGrade, student),
                 buildCourseNameAndGradePredicate(courseName, courseGrade, student)
         );
     }
@@ -61,20 +59,6 @@ public class StudentFilter {
         return Objects.nonNull(value) ? operation.apply(value) : null;
     }
 
-    private static Predicate buildCourseNamePredicate(String courseName, Grade courseGrade, QStudent student) {
-        if (Objects.nonNull(courseName) && Objects.isNull(courseGrade)) {
-            return student.enrollments.any().course.name.containsIgnoreCase(courseName);
-        }
-        return null;
-    }
-
-    private static Predicate buildCourseGradePredicate(String courseName, Grade courseGrade, QStudent student) {
-        if (Objects.nonNull(courseGrade) && Objects.isNull(courseName)) {
-            return student.enrollments.any().grade.eq(courseGrade);
-        }
-        return null;
-    }
-
     private static Predicate buildCourseNameAndGradePredicate(String courseName, Grade courseGrade, QStudent student) {
         QEnrollment enrollment = QEnrollment.enrollment;
 
@@ -86,6 +70,13 @@ public class StudentFilter {
                                             .and(enrollment.grade.eq(courseGrade))))
             );
         }
+        if (Objects.nonNull(courseName)) {
+            return student.enrollments.any().course.name.containsIgnoreCase(courseName);
+        }
+        if (Objects.nonNull(courseGrade)) {
+            return student.enrollments.any().grade.eq(courseGrade);
+        }
+
         return null;
     }
 
