@@ -22,7 +22,7 @@ public class Student {
     private int age;
     private String email;
 
-    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "student", cascade = CascadeType.REMOVE)
     private Set<Enrollment> enrollments;
 
 }

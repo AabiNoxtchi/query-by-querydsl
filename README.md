@@ -23,23 +23,36 @@ using a fluent and type-safe API to overcome the challenges of handling complex 
 
 ### QueryDSL Usage Demonstration ###  
 
-To demonstrate the usage of queryDSL filtering, Student entity is created and corresponding StudentFilter class, 
+- To demonstrate the usage of queryDSL filtering, Student entity is created and corresponding StudentFilter class, 
 with all possible properties to filter with.  
 this approach is designed to create dynamic and complex queries with ease, and based on client needs, weather
 clients choose to filter or not, or choose different properties each time.  
 This class `StudentFilter` will bind chosen properties and generate the Predicate to filter with to 
 QuerydslPredicateExecutor<Student> repository findAll method.  
-
-`QuerydslPredicateExecutor<T>` interface provides findAll and overloads with Pageable, Sort and more, 
+<br>
+- `QuerydslPredicateExecutor<T>` interface provides findAll and overloads with Pageable, Sort and more, 
 besides count, exists, findOne, getBy and more, all which take a Predicate.  
-Repositories in this system extends `QuerydslPredicateExecutor<T>` to use these methods with Predicate and also extends 
-`JpaRepository` to use its methods as well like findAll and count without Predicate. Although one true Predicate could be
-constructed for these cases as `Expressions.asBoolean(true).isTrue()`, which will evaluate to true for all records.
+<br>
+- Repositories in this system extends `QuerydslPredicateExecutor<T>` (StudentRepository) to use these methods with Predicate and also extends 
+`JpaRepository` (all repositories) to use its methods as well like findAll and count without Predicate. Although one true Predicate could be
+constructed for these cases as `Expressions.asBoolean(true).isTrue()`, which will evaluate to true for all records.  
+<br>
+- `InitialTestData` class is provided to initialize database with data, and StudentServiceTest demonstrates some usages for Student entity.
+because tests in this project use `@SpringBootTest` and no different profiles are defined, the test data will be initialized.  
+<br>
+- For demonstration purposes most tests in this repository are made with H2 database, it is preferable to use same 
+database both in the project and in the tests, because databases differ from one another.  
+<br>
+- `@EntityGraph` is one of the ways used to explicitly load lazy fetching type associations if needed,
+so findByEnrollmentsNotNull is defined in StudentRepository, the name is selected to be able to define the signature without overriding findAll method.
+the method is used to fetching all students with their enrollments, and courses,
+this is used in tests, to prepare test filters and prepare the expectedValue. the method declaration is as follows : 
+```
+    @EntityGraph(attributePaths = {"enrollments", "enrollments.course"})
+    List<Student> findByEnrollmentsNotNull();
+```
 
-`InitialTestData` class is provided to initialize database with data, and StudentServiceTest demonstrates some usages for Student entity.  
-
-For demonstration purposes most tests in this repository are made with H2 database, it is preferable to use same 
-database both in the project and in the tests, because databases differ from one another.
+<br><br>  
 
 ### Reference Documentation
 For further reference, please consider the following sections:
